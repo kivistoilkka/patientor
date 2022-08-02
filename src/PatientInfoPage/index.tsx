@@ -4,7 +4,7 @@ import { apiBaseUrl } from "../constants";
 import { Patient } from "../types";
 
 import { useParams } from "react-router-dom"; 
-import { useStateValue } from "../state";
+import { useStateValue, setPatient } from "../state";
 import { Box, Typography } from "@material-ui/core";
 
 const PatientInfoPage = () => {
@@ -17,7 +17,7 @@ const PatientInfoPage = () => {
     return (
       <div className="App">
           <Typography variant="h6" style={{ marginTop: "0.5em" }}>
-            Patient not with the id {id} could not be found.
+            Patient with the id {id} could not be found.
         </Typography>
       </div>
     );
@@ -29,7 +29,7 @@ const PatientInfoPage = () => {
         const { data: patientInfoFromApi } = await axios.get<Patient>(
           `${apiBaseUrl}/patients/${patient.id}`
         );
-        dispatch({ type: "SET_PATIENT", payload: patientInfoFromApi });
+        dispatch(setPatient(patientInfoFromApi));
       } catch (e) {
         console.error(e);
       }
