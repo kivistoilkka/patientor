@@ -45,14 +45,18 @@ const PatientInfoPage = () => {
 
     if (entries.length === 0) {
       return (
-        <Typography variant="body2">No entries</Typography>
+        <Typography variant="body2" style={{ marginTop: "0.5em" }}>
+          No entries
+        </Typography>
       );
     }
 
     return (
       entries.map(entry => {
         return (
-          <EntryDetails entry={entry} key={entry.id} />
+          <Box key={entry.id} sx={{ p: 1, my: 1, border: "1px solid grey", borderRadius: "7px" }}>
+            <EntryDetails entry={entry} />
+          </Box>
         );
       })
     );
