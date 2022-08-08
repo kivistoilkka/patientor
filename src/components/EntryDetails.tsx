@@ -7,6 +7,7 @@ import {
   SickLeave
 } from "../types";
 import { useStateValue } from "../state";
+import { assertNever } from "../utils";
 
 import { Typography } from "@material-ui/core";
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
@@ -28,12 +29,6 @@ type OccupationalHealthcareEntryProps = {
 
 type HospitalEntryProps = {
   entry: HospitalEntry;
-};
-
-const assertNever = (value: never): never => {
-  throw new Error(
-    `Unhandled discriminated union member: ${JSON.stringify(value)}`
-  );
 };
 
 const formatDiagnosisCodes = (codes: string[] | undefined) => {

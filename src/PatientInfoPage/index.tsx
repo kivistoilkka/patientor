@@ -1,12 +1,16 @@
 import axios from "axios";
 
 import { apiBaseUrl } from "../constants";
-import { Patient, Entry } from "../types";
+import { Patient, Entry, Gender } from "../types";
+import EntryDetails from "../components/EntryDetails";
+import { assertNever } from "../utils";
 
 import { useParams } from "react-router-dom"; 
 import { useStateValue, setPatient } from "../state";
 import { Box, Typography } from "@material-ui/core";
-import EntryDetails from "../components/EntryDetails";
+import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
+import FemaleIcon from '@mui/icons-material/Female';
+import MaleIcon from '@mui/icons-material/Male';
 
 const PatientInfoPage = () => {
   const [{ patients }, dispatch] = useStateValue();
@@ -61,16 +65,27 @@ const PatientInfoPage = () => {
       })
     );
   };
+
+  const genderIcon = (gender: Gender) => {
+    switch (gender) {
+      case Gender.Other:
+        return <CircleOutlinedIcon fontSize="small" />;
+      case Gender.Female:
+        return <FemaleIcon />;
+      case Gender.Male:
+        return <MaleIcon />;
+      default:
+        return assertNever(gender);
+    }
+  };
   
   return (
       <div className="App">
         <Box>
           <Typography variant="h5" style={{ marginTop: "0.5em" }}>
-            {patient.name}
+            {patient.name} {genderIcon(patient.gender)}
           </Typography>
-          <Typography variant="body1">
-            gender: {patient.gender}<br />
-            date of birth: {patient.dateOfBirth}<br />
+          <Typography variant="body1" style={{ marginTop: "0.5em" }}>
             ssn: {patient.ssn} <br />
             occupation: {patient.occupation}
           </Typography>
