@@ -8,7 +8,7 @@ import { useStateValue, setPatient } from "../state";
 import { Box, Typography } from "@material-ui/core";
 
 const PatientInfoPage = () => {
-  const [{ patients }, dispatch] = useStateValue();
+  const [{ patients, diagnoses }, dispatch] = useStateValue();
 
   const { id } = useParams<{ id: string }>();
   const patient = Object.values(patients).find((patient => patient.id === id));
@@ -43,7 +43,7 @@ const PatientInfoPage = () => {
         codes.map(code => {
           return (
             <li key={code}>
-              <Typography variant="body2">{code}</Typography>
+              <Typography variant="body2">{code} {diagnoses[code].name}</Typography>
             </li>
           );
         })
