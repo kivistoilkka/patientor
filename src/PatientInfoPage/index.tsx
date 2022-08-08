@@ -6,9 +6,10 @@ import { Patient, Entry } from "../types";
 import { useParams } from "react-router-dom"; 
 import { useStateValue, setPatient } from "../state";
 import { Box, Typography } from "@material-ui/core";
+import EntryDetails from "../components/EntryDetails";
 
 const PatientInfoPage = () => {
-  const [{ patients, diagnoses }, dispatch] = useStateValue();
+  const [{ patients }, dispatch] = useStateValue();
 
   const { id } = useParams<{ id: string }>();
   const patient = Object.values(patients).find((patient => patient.id === id));
@@ -37,43 +38,24 @@ const PatientInfoPage = () => {
     void fetchPatientInfo();
   }
 
-  const formatDiagnosisCodes = (codes: string[] | undefined) => {
-    if (codes) {
-      return (
-        codes.map(code => {
-          return (
-            <li key={code}>
-              <Typography variant="body2">{code} {diagnoses[code].name}</Typography>
-            </li>
-          );
-        })
-      );
-    }
-  };
-
   const formatEntries = (entries: Entry[] | undefined) => {
-    if (entries) {
-      if (entries.length === 0) {
-        return (
-          <Typography variant="body2">No entries</Typography>
-        );
-      }
+    if (!entries) {
+      return;
+    }
 
+    if (entries.length === 0) {
       return (
-        entries.map(entry => {
-          return (
-            <div key={entry.id}>
-              <Typography variant="body2" style={{ marginTop: "0.5em" }}>
-                {entry.date} <i>{entry.description}</i>
-              </Typography>
-              <ul>
-                {formatDiagnosisCodes(entry.diagnosisCodes)}
-              </ul>
-            </div>
-          );
-        })
+        <Typography variant="body2">No entries</Typography>
       );
     }
+
+    return (
+      entries.map(entry => {
+        return (
+          <EntryDetails entry={entry} key={entry.id} />
+        );
+      })
+    );
   };
   
   return (
@@ -92,7 +74,6 @@ const PatientInfoPage = () => {
             entries
           </Typography>
             {formatEntries(patient.entries)}
-          
         </Box>
       </div>
     );
