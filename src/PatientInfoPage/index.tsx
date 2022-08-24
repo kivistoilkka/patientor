@@ -131,13 +131,15 @@ const PatientInfoPage = () => {
     }
 
     return (
-      entries.map(entry => {
-        return (
-          <Box key={entry.id} sx={{ p: 1, my: 1, border: "1px solid grey", borderRadius: "7px" }}>
-            <EntryDetails entry={entry} />
-          </Box>
-        );
-      })
+      entries
+        .sort((a, b) => Date.parse(b.date) - Date.parse(a.date))
+        .map(entry => {
+          return (
+            <Box key={entry.id} sx={{ p: 1, my: 1, border: "1px solid grey", borderRadius: "7px" }}>
+              <EntryDetails entry={entry} />
+            </Box>
+          );
+        })
     );
   };
 
