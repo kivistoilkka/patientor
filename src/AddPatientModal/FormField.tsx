@@ -7,7 +7,7 @@ import {
   TextField as TextFieldMUI,
   Typography,
 } from "@material-ui/core";
-import { Diagnosis, Gender } from "../types";
+import { Diagnosis, Gender, HealthCheckRating } from "../types";
 import { InputLabel } from "@material-ui/core";
 import Input from '@material-ui/core/Input';
 
@@ -27,6 +27,36 @@ type SelectFieldProps = {
 const FormikSelect = ({ field, ...props }: FieldProps) => <Select {...field} {...props} />;
 
 export const SelectField = ({ name, label, options }: SelectFieldProps) => (
+  <>
+    <InputLabel>{label}</InputLabel>
+    <Field
+      fullWidth
+      style={{ marginBottom: "0.5em" }}
+      label={label}
+      component={FormikSelect}
+      name={name}
+    >
+      {options.map((option) => (
+        <MenuItem key={option.value} value={option.value}>
+          {option.label || option.value}
+        </MenuItem>
+      ))}
+    </Field>
+  </>
+);
+
+export type RatingOption = {
+  value: HealthCheckRating;
+  label: string;
+};
+
+type RatingSelectFieldProps = {
+  name: string;
+  label: string;
+  options: RatingOption[];
+};
+
+export const RatingSelectField = ({ name, label, options }: RatingSelectFieldProps) => (
   <>
     <InputLabel>{label}</InputLabel>
     <Field
@@ -114,7 +144,7 @@ export const DiagnosisSelection = ({
   const onChange = (data: string[]) => {    
     setDiagnoses([...data]);
     setFieldTouched(field, true);
-    setFieldValue(field, selectedDiagnoses);
+    setFieldValue(field, [...data]); // fix from pull request "fix: missing last selected diagnosis code #1" (25 Jun 2022) on the original project
   };
 
   const stateOptions = diagnoses.map((diagnosis) => ({

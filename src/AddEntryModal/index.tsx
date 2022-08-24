@@ -3,6 +3,7 @@ import { Dialog, DialogTitle, DialogContent, Divider } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 import AddHealthCheckEntryForm, { HealthCheckEntryFormValues } from "./AddHealthCheckEntryForm";
 import AddOccupationalHealthcareEntryForm, { OccupationalHealthcareEntryFormValues } from "./AddOccupationalHealthcareEntryForm";
+import AddHospitalEntryForm, { HospitalEntryFormValues } from "./AddHospitalEntryForm";
 
 interface HealthCheckProps {
   modalOpen: boolean;
@@ -13,7 +14,7 @@ interface HealthCheckProps {
 
 export const AddHealthCheckEntryModal = ({ modalOpen, onClose, onSubmit, error }: HealthCheckProps) => (
   <Dialog fullWidth={true} open={modalOpen} onClose={() => onClose()}>
-    <DialogTitle>Add a new health check entry</DialogTitle>
+    <DialogTitle>New health check entry</DialogTitle>
     <Divider />
     <DialogContent>
       {error && <Alert severity="error">{error}</Alert>}
@@ -31,11 +32,29 @@ interface OccupationalHealthcareProps {
 
 export const AddOccupationalHealthcareEntryModal = ({ modalOpen, onClose, onSubmit, error }: OccupationalHealthcareProps) => (
   <Dialog fullWidth={true} open={modalOpen} onClose={() => onClose()}>
-    <DialogTitle>Add a new occupational healthcare entry</DialogTitle>
+    <DialogTitle>New occupational healthcare entry</DialogTitle>
     <Divider />
     <DialogContent>
       {error && <Alert severity="error">{error}</Alert>}
       <AddOccupationalHealthcareEntryForm onSubmit={onSubmit} onCancel={onClose} />
+    </DialogContent>
+  </Dialog>
+);
+
+interface HospitalProps {
+  modalOpen: boolean;
+  onClose: () => void;
+  onSubmit: (values: HospitalEntryFormValues) => void;
+  error?: string;
+}
+
+export const AddHospitalEntryModal = ({ modalOpen, onClose, onSubmit, error }: HospitalProps) => (
+  <Dialog fullWidth={true} open={modalOpen} onClose={() => onClose()}>
+    <DialogTitle>New hospital entry</DialogTitle>
+    <Divider />
+    <DialogContent>
+      {error && <Alert severity="error">{error}</Alert>}
+      <AddHospitalEntryForm onSubmit={onSubmit} onCancel={onClose} />
     </DialogContent>
   </Dialog>
 );

@@ -4,28 +4,25 @@ import { Field, Formik, Form } from "formik";
 
 import {
   TextField,
-  RatingSelectField,
-  DiagnosisSelection,
-  RatingOption
+  DiagnosisSelection
 } from "../AddPatientModal/FormField";
-import { HealthCheckEntry, HealthCheckRating } from "../types";
+import { HospitalEntry } from "../types";
 import { useStateValue } from "../state";
 
-export type HealthCheckEntryFormValues = Omit<HealthCheckEntry, "id">;
+export type HospitalEntryFormValuesToPost = Omit<HospitalEntry, "id">;
+
+type OmitedEntryFormValues = Omit<HospitalEntry, "id" | "discharge">;
+export interface HospitalEntryFormValues extends OmitedEntryFormValues {
+  dischargeDate: string;
+  dischargeCriteria: string;
+}
 
 interface Props {
-  onSubmit: (values: HealthCheckEntryFormValues) => void;
+  onSubmit: (values: HospitalEntryFormValues) => void;
   onCancel: () => void;
 }
 
-const ratingOptions: RatingOption[] = [
-  { value: HealthCheckRating.Healthy, label: "Healthy" },
-  { value: HealthCheckRating.LowRisk, label: "Low Risk" },
-  { value: HealthCheckRating.HighRisk, label: "High Risk" },
-  { value: HealthCheckRating.CriticalRisk, label: "Critical Risk" },
-];
-
-export const AddHealthCheckEntryForm = ({ onSubmit, onCancel }: Props) => {
+export const AddHospitalEntryForm = ({ onSubmit, onCancel }: Props) => {
   const [{ diagnoses }] = useStateValue();
 
   return (
@@ -34,24 +31,38 @@ export const AddHealthCheckEntryForm = ({ onSubmit, onCancel }: Props) => {
       date: "",
       specialist: "",
       description: "",
-      healthCheckRating: HealthCheckRating.Healthy,
-      type: "HealthCheck"
+      dischargeDate: "",
+      dischargeCriteria: "",
+      type: "Hospital"
     }}
     onSubmit={onSubmit}
     validate={values => {
       const requiredError = "Field is required";
+      const dateError = "Date format incorrect, use YYYY-MM-DD";
       const errors: { [field: string]: string } = {};
       const re = /^\d{4}-\d{2}-\d{2}$/;
       if (!values.date) {
         errors.date = requiredError;
-      } else if (!re.test(values.date) || Boolean(Date.parse(values.date)) === false) {
-        errors.date = "Date format incorrect, use YYYY-MM-DD";
+      } else if (
+        !re.test(values.date) ||
+        Boolean(Date.parse(values.date)) === false
+      ) {
+        errors.date = dateError;
       }
       if (!values.specialist) {
         errors.specialist = requiredError;
       }
       if (!values.description) {
         errors.description = requiredError;
+      }
+      if (
+        !re.test(values.dischargeDate) ||
+        Boolean(Date.parse(values.dischargeDate)) === false
+      ) {
+        errors.dischargeDate = dateError;
+      }
+      if (!values.dischargeCriteria) {
+        errors.dischargeCriteria = requiredError;
       }
       return errors;
     }}
@@ -77,15 +88,22 @@ export const AddHealthCheckEntryForm = ({ onSubmit, onCancel }: Props) => {
             name="description"
             component={TextField}
           />
+          <Field
+            label="Discharge date"
+            placeholder="YYYY-MM-DD"
+            name="dischargeDate"
+            component={TextField}
+          />
+          <Field
+            label="Discharge criteria"
+            placeholder="Discharge Criteria"
+            name="dischargeCriteria"
+            component={TextField}
+          />
           <DiagnosisSelection
             setFieldValue={setFieldValue}
             setFieldTouched={setFieldTouched}
             diagnoses={Object.values(diagnoses)}
-          />
-          <RatingSelectField
-            label="Health Check Rating"
-            name="healthCheckRating"
-            options={ratingOptions}
           />
           <Grid>
               <Grid item>
@@ -120,4 +138,4 @@ export const AddHealthCheckEntryForm = ({ onSubmit, onCancel }: Props) => {
   );
 };
 
-export default AddHealthCheckEntryForm;
+export default AddHospitalEntryForm;

@@ -6,7 +6,8 @@ import { Patient, Entry, Gender } from "../types";
 import EntryDetails from "../components/EntryDetails";
 import { HealthCheckEntryFormValues } from "../AddEntryModal/AddHealthCheckEntryForm";
 import { OccupationalHealthcareEntryFormValues, OccupationalHealthcareEntryFormValuesToPost } from "../AddEntryModal/AddOccupationalHealthcareEntryForm";
-import { AddHealthCheckEntryModal, AddOccupationalHealthcareEntryModal } from "../AddEntryModal";
+import { HospitalEntryFormValues, HospitalEntryFormValuesToPost } from "../AddEntryModal/AddHospitalEntryForm";
+import { AddHealthCheckEntryModal, AddOccupationalHealthcareEntryModal, AddHospitalEntryModal } from "../AddEntryModal";
 import { assertNever } from "../utils";
 
 import { useParams } from "react-router-dom"; 
@@ -33,6 +34,13 @@ const PatientInfoPage = () => {
   const openOccupationalHealthcareModal = (): void => setOccupationalHealthcareModalOpen(true);
   const closeOccupationalHealthcareModal = (): void => {
     setOccupationalHealthcareModalOpen(false);
+    setError(undefined);
+  };
+
+  const [hospitalModalOpen, setHospitalModalOpen] = React.useState<boolean>(false);
+  const openHospitalModal = (): void => setHospitalModalOpen(true);
+  const closeHospitalModal = (): void => {
+    setHospitalModalOpen(false);
     setError(undefined);
   };
 
@@ -63,6 +71,16 @@ const PatientInfoPage = () => {
     void fetchPatientInfo();
   }
 
+  const handleError = (e: unknown): void => {
+    if (axios.isAxiosError(e)) {
+      console.error(e?.response?.data || "Unrecognized axios error");
+      setError(String(e?.response?.data) || "Unrecognized axios error");
+    } else {
+      console.error("Unknown error", e);
+      setError("Unknown error");
+    }
+  };
+
   const submitNewHealthCheckEntry = async (values: HealthCheckEntryFormValues) => {
     try {
       const { data: newEntry } = await axios.post<Entry>(
@@ -72,13 +90,7 @@ const PatientInfoPage = () => {
       dispatch(addEntry({ id: patient.id, entry: newEntry }));
       closeHealthCheckModal();
     } catch (e: unknown) {
-      if (axios.isAxiosError(e)) {
-        console.error(e?.response?.data || "Unrecognized axios error");
-        setError(String(e?.response?.data) || "Unrecognized axios error");
-      } else {
-        console.error("Unknown error", e);
-        setError("Unknown error");
-      }
+      handleError(e);
     }
   };
 
@@ -107,13 +119,27 @@ const PatientInfoPage = () => {
         closeOccupationalHealthcareModal();
       }
     } catch (e: unknown) {
-      if (axios.isAxiosError(e)) {
-        console.error(e?.response?.data || "Unrecognized axios error");
-        setError(String(e?.response?.data) || "Unrecognized axios error");
-      } else {
-        console.error("Unknown error", e);
-        setError("Unknown error");
-      }
+      handleError(e);
+    }
+  };
+
+  const submitNewHospitalEntry = async (values: HospitalEntryFormValues) => {
+    try {
+    const modifiedValues: HospitalEntryFormValuesToPost = {
+        ...values,
+        discharge: {
+          date: values.dischargeDate,
+          criteria: values.dischargeCriteria
+        }
+      };
+      const { data: newEntry } = await axios.post<Entry>(
+        `${apiBaseUrl}/patients/${patient.id}/entries`,
+        modifiedValues
+      );
+      dispatch(addEntry({ id: patient.id, entry: newEntry }));
+      closeHospitalModal();
+    } catch (e: unknown) {
+      handleError(e);
     }
   };
 
@@ -174,7 +200,7 @@ const PatientInfoPage = () => {
             onClose={closeHealthCheckModal}
           />
           <Button variant="contained" onClick={() => openHealthCheckModal()}>
-            Add New Health Check Entry
+            New Health Check Entry
           </Button>
 
           <AddOccupationalHealthcareEntryModal
@@ -184,7 +210,17 @@ const PatientInfoPage = () => {
             onClose={closeOccupationalHealthcareModal}
           />
           <Button variant="contained" onClick={() => openOccupationalHealthcareModal()}>
-            Add New Occupational Healthcare Entry
+            New Occupational Healthcare Entry
+          </Button>
+
+          <AddHospitalEntryModal
+            modalOpen={hospitalModalOpen}
+            onSubmit={submitNewHospitalEntry}
+            error={error}
+            onClose={closeHospitalModal}
+          />
+          <Button variant="contained" onClick={() => openHospitalModal()}>
+            New Hospital Entry
           </Button>
 
           <Typography variant="h6" style={{ marginTop: "0.5em" }}>

@@ -1,11 +1,11 @@
 import React from "react";
-import { Grid, Button } from "@material-ui/core";
+import { Grid, Button, InputLabel } from "@material-ui/core";
 import { Field, Formik, Form } from "formik";
 
 import {
   TextField,
   DiagnosisSelection
-} from "./FormField";
+} from "../AddPatientModal/FormField";
 import { OccupationalHealthcareEntry } from "../types";
 import { useStateValue } from "../state";
 
@@ -104,6 +104,7 @@ export const AddOccupationalHealthcareEntryForm = ({ onSubmit, onCancel }: Props
             name="employerName"
             component={TextField}
           />
+          <InputLabel>Sick leave information (optional)</InputLabel>
           <Field
             label="Sick Leave Start"
             placeholder="YYYY-MM-DD"
