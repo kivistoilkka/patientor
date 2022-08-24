@@ -1,19 +1,33 @@
+import React from "react";
 import axios from "axios";
 
 import { apiBaseUrl } from "../constants";
 import { Patient, Entry, Gender } from "../types";
 import EntryDetails from "../components/EntryDetails";
+import { HealthCheckEntryFormValues } from "../AddEntryModal/AddHealthCheckEntryForm";
+import AddEntryModal from "../AddEntryModal";
 import { assertNever } from "../utils";
 
 import { useParams } from "react-router-dom"; 
-import { useStateValue, setPatient } from "../state";
-import { Box, Typography } from "@material-ui/core";
+import { useStateValue, setPatient, addEntry } from "../state";
+
+import { Box, Typography, Button } from "@material-ui/core";
 import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 import FemaleIcon from '@mui/icons-material/Female';
 import MaleIcon from '@mui/icons-material/Male';
 
 const PatientInfoPage = () => {
   const [{ patients }, dispatch] = useStateValue();
+
+  const [modalOpen, setModalOpen] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<string>();
+
+  const openModal = (): void => setModalOpen(true);
+
+  const closeModal = (): void => {
+    setModalOpen(false);
+    setError(undefined);
+  };
 
   const { id } = useParams<{ id: string }>();
   const patient = Object.values(patients).find((patient => patient.id === id));
@@ -41,6 +55,25 @@ const PatientInfoPage = () => {
     };
     void fetchPatientInfo();
   }
+
+  const submitNewHealthCheckEntry = async (values: HealthCheckEntryFormValues) => {
+    try {
+      const { data: newEntry } = await axios.post<Entry>(
+        `${apiBaseUrl}/patients/${patient.id}/entries`,
+        values
+      );
+      dispatch(addEntry({ id: patient.id, entry: newEntry }));
+      closeModal();
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        console.error(e?.response?.data || "Unrecognized axios error");
+        setError(String(e?.response?.data?.error) || "Unrecognized axios error");
+      } else {
+        console.error("Unknown error", e);
+        setError("Unknown error");
+      }
+    }
+  };
 
   const formatEntries = (entries: Entry[] | undefined) => {
     if (!entries) {
@@ -89,6 +122,15 @@ const PatientInfoPage = () => {
             ssn: {patient.ssn} <br />
             occupation: {patient.occupation}
           </Typography>
+          <AddEntryModal
+            modalOpen={modalOpen}
+            onSubmit={submitNewHealthCheckEntry}
+            error={error}
+            onClose={closeModal}
+          />
+          <Button variant="contained" onClick={() => openModal()}>
+            Add New Health Check Entry
+          </Button>
           <Typography variant="h6" style={{ marginTop: "0.5em" }}>
             entries
           </Typography>
