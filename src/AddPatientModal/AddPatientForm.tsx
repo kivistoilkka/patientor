@@ -42,8 +42,11 @@ export const AddPatientForm = ({ onSubmit, onCancel }: Props) => {
         if (!values.ssn) {
           errors.ssn = requiredError;
         }
+        const re = /^\d{4}-\d{2}-\d{2}$/;
         if (!values.dateOfBirth) {
           errors.dateOfBirth = requiredError;
+        } else if (!re.test(values.dateOfBirth) || Boolean(Date.parse(values.dateOfBirth)) === false) {
+          errors.dateOfBirth = "Date format incorrect, use YYYY-MM-DD";
         }
         if (!values.occupation) {
           errors.occupation = requiredError;

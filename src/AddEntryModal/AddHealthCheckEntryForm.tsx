@@ -41,8 +41,11 @@ export const AddHealthCheckEntryForm = ({ onSubmit, onCancel }: Props) => {
     validate={values => {
       const requiredError = "Field is required";
       const errors: { [field: string]: string } = {};
+      const re = /^\d{4}-\d{2}-\d{2}$/;
       if (!values.date) {
         errors.date = requiredError;
+      } else if (!re.test(values.date) || Boolean(Date.parse(values.date)) === false) {
+        errors.date = "Date format incorrect, use YYYY-MM-DD";
       }
       if (!values.specialist) {
         errors.specialist = requiredError;
